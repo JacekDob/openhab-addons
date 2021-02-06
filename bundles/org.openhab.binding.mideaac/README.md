@@ -1,56 +1,88 @@
 # MideaAC Binding
 
-_Give some details about what this binding is meant for - a protocol, system, specific device._
+This is the binding for [Midea Air Conditioner](https://www.midea.com/us/Air-Conditioners).
+This binding allows you to integrate, view and control Midea Air Conditioner in the openHAB environment.
 
-_If possible, provide some resources like pictures, a YouTube video, etc. to give an impression of what can be done with this binding. You can place such resources into a `doc` folder next to this README.md._
+Thank you for sharing as it it based on:
+[mac-zhou/midea-msmart](https://github.com/mac-zhou/midea-msmart/tree/master/msmart)
 
 ## Supported Things
 
-_Please describe the different supported things / devices within this section._
-_Which different types are supported, which models were tested etc.?_
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+Device supported
+
+| Thing type               | Name                                               |
+|--------------------------|----------------------------------------------------|
+| mideaac                  | Midea Air Conditioner v. 2 and v. 3                |
 
 ## Discovery
 
-_Describe the available auto-discovery features here. Mention for what it works and what needs to be kept in mind when using it._
+All devices in LAN are discovered automatically.
 
-## Binding Configuration
+### Things
 
-_If your binding requires or supports general configuration settings, please create a folder ```cfg``` and place the configuration file ```<bindingId>.cfg``` inside it. In this section, you should link to this file and provide some information about the options. The file could e.g. look like:_
+Minimal Thing configuration:
 
 ```
-# Configuration for the Philips Hue Binding
-#
-# Default secret key for the pairing of the Philips Hue Bridge.
-# It has to be between 10-40 (alphanumeric) characters
-# This may be changed by the user for security reasons.
-secret=openHABSecret
+UID: mideaac:ac:mideaac__192_168_x_x__12345678901234__net_ac_abcd
+label: LABEL
+thingTypeUID: mideaac:ac
+configuration:
+  ipAddress: 192.168.x.x
+  ipPort: "6444"
+  deviceId: "12345678901234"
 ```
 
-_Note that it is planned to generate some part of this based on the information that is available within ```src/main/resources/OH-INF/binding``` of your binding._
+### Channels
 
-_If your binding does not offer any generic configurations, you can remove this section completely._
+Following items are tested and working:
 
-## Thing Configuration
+| Lchannel                 | type                 | description                                                                                   |
+|--------------------------|----------------------|-----------------------------------------------------------------------------------------------|
+| Power                    | Switch               | Turn the AC on and off.                                                                       |
+| Target temperature       | Number:Temperature   | Target temperature.                                                                           |
+| Operational mode         | String               | Operational mode: OFF (turns off), AUTO, COOL, DRY, HEAT.                                     |
+| Fan speed                | String               | Fan speed: OFF (turns off), SILENT, LOW, MEDIUM, HIGH, AUTO.                                  |
+| Swing mode               | String               | Swing mode: OFF, VERTICAL, HORIZONTAL, BOTH.                                                  |
+| Eco mode                 | Switch               | Eco mode.                                                                                     |
+| Turbo mode               | Switch               | Turbo mode, "Boost" in Midea Air app, long press "+" on IR Remote Controller.                 |
+| Indoor Temperature       | Number:Temperature   | Indoor temperature measured in the room, where internal unit is installed.                    |
+| OutdoorTemperature       | Number:Temperature   | Outdoor temperature measured outside, where external unit is installed.                       |
+| Sleep function           | Switch               | Sleep function ("Moon with a star" icon on IR Remote Controller).                             |
+| Screen display           | Switch               | Turns on and off displaying white digits on a device. Can be set, but status is not returned. |
 
-_Describe what is needed to manually configure a thing, either through the (Paper) UI or via a thing-file. This should be mainly about its mandatory and optional configuration parameters. A short example entry for a thing file can help!_
+Following items are in API but are not tested as working (marked as advanced channels):
+- Imode resume
+- Timer mode
+- Appliance error
+- ON Timer
+- OFF Timer
+- Cozy sleep
+- Save
+- Low frequency fan
+- Super fan
+- Feel own 
+- Child sleep mode
+- Exchange air
+- Dry clean
+- Aux heat
+- Clean up
+- Temperature unit
+- Catch cold
+- Night light
+- Peak elec
+- Natural fan
+- Humidity
 
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+### Debugging and Tracing
 
-## Channels
+If you want to see what's going on in the binding, switch the loglevel to TRACE in the Karaf console
 
-_Here you should provide information about available channel types, what their meaning is and how they can be used._
+```
+log:set TRACE org.openhab.binding.mideaac
+```
 
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+Set the logging back to normal
 
-| channel  | type   | description                  |
-|----------|--------|------------------------------|
-| control  | Switch | This is the control channel  |
-
-## Full Example
-
-_Provide a full usage example based on textual configuration files (*.things, *.items, *.sitemap)._
-
-## Any custom content here!
-
-_Feel free to add additional sections for whatever you think should also be mentioned about your binding!_
+```
+log:set INFO org.openhab.binding.mideaac
+```
