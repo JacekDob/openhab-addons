@@ -12,7 +12,7 @@ Device supported
 
 | Thing type               | Name                                               |
 |--------------------------|----------------------------------------------------|
-| mideaac                  | Midea Air Conditioner v. 2 and v. 3                |
+| midea:ac                 | Midea Air Conditioner v. 2 and v. 3                |
 
 ## Discovery
 
@@ -36,7 +36,7 @@ configuration:
 
 Following items are tested and working:
 
-| Lchannel                 | type                 | description                                                                                   |
+| channel                  | type                 | description                                                                                   |
 |--------------------------|----------------------|-----------------------------------------------------------------------------------------------|
 | Power                    | Switch               | Turn the AC on and off.                                                                       |
 | Target temperature       | Number:Temperature   | Target temperature.                                                                           |
