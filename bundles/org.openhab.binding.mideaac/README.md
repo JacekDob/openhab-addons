@@ -1,7 +1,7 @@
 # MideaAC Binding
 
 This is the binding for [Midea Air Conditioner](https://www.midea.com/us/Air-Conditioners).
-This binding allows you to integrate, view and control Midea Air Conditioner in the openHAB environment.
+This binding allows you to integrate, view and control Midea Air Conditioner in the openHAB environment in LAN without Midea Cloud.
 
 Thank you for sharing as it it based on:
 [mac-zhou/midea-msmart](https://github.com/mac-zhou/midea-msmart/tree/master/msmart)
@@ -36,21 +36,21 @@ configuration:
 
 Following items are tested and working:
 
-| channel                  | type                 | description                                                                                   |
-|--------------------------|----------------------|-----------------------------------------------------------------------------------------------|
-| Power                    | Switch               | Turn the AC on and off.                                                                       |
-| Target temperature       | Number:Temperature   | Target temperature.                                                                           |
-| Operational mode         | String               | Operational mode: OFF (turns off), AUTO, COOL, DRY, HEAT.                                     |
-| Fan speed                | String               | Fan speed: OFF (turns off), SILENT, LOW, MEDIUM, HIGH, AUTO.                                  |
-| Swing mode               | String               | Swing mode: OFF, VERTICAL, HORIZONTAL, BOTH.                                                  |
-| Eco mode                 | Switch               | Eco mode.                                                                                     |
-| Turbo mode               | Switch               | Turbo mode, "Boost" in Midea Air app, long press "+" on IR Remote Controller.                 |
-| Indoor Temperature       | Number:Temperature   | Indoor temperature measured in the room, where internal unit is installed.                    |
-| OutdoorTemperature       | Number:Temperature   | Outdoor temperature measured outside, where external unit is installed.                       |
-| Sleep function           | Switch               | Sleep function ("Moon with a star" icon on IR Remote Controller).                             |
-| Screen display           | Switch               | Turns on and off displaying white digits on a device. Can be set, but status is not returned. |
+| channel                  | type                 | description                                                                                                      | read only |
+|--------------------------|----------------------|------------------------------------------------------------------------------------------------------------------|-----------|
+| Power                    | Switch               | Turn the AC on and off.                                                                                          |           |
+| Target temperature       | Number:Temperature   | Target temperature.                                                                                              |           |
+| Operational mode         | String               | Operational mode: OFF (turns off), AUTO, COOL, DRY, HEAT.                                                        |           |
+| Fan speed                | String               | Fan speed: OFF (turns off), SILENT, LOW, MEDIUM, HIGH, AUTO.                                                     |           |
+| Swing mode               | String               | Swing mode: OFF, VERTICAL, HORIZONTAL, BOTH.                                                                     |           |
+| Eco mode                 | Switch               | Eco mode, according to manual works only in COOL mode (temperature shall be set to 24C and fan on AUTO).         | yes       |
+| Turbo mode               | Switch               | Turbo mode, "Boost" in Midea Air app, long press "+" on IR Remote Controller. Only works in COOL and HEAT mode.  |           |
+| Indoor temperature       | Number:Temperature   | Indoor temperature measured in the room, where internal unit is installed.                                       | yes       |
+| Outdoor temperature      | Number:Temperature   | Outdoor temperature measured outside, where external unit is installed.                                          | yes       |
+| Sleep function           | Switch               | Sleep function ("Moon with a star" icon on IR Remote Controller).                                                | yes       |
 
 Following items are in API but are not tested as working (marked as advanced channels):
+- Screen display
 - Imode resume
 - Timer mode
 - Appliance error

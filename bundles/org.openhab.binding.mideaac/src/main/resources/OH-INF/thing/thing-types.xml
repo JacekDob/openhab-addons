@@ -11,66 +11,66 @@
 
 		<channels>
 			<channel id="power" typeId="power" />
-			<channel id="target-temperature" typeId="target-temperature" />
-			<channel id="operational-mode" typeId="operational-mode" />
-			<channel id="fan-speed" typeId="fan-speed" />
-			<channel id="swing-mode" typeId="swing-mode" />
-			<channel id="eco-mode" typeId="eco-mode" />
-			<channel id="turbo-mode" typeId="turbo-mode" />
-			<channel id="indoor-temperature" typeId="indoor-temperature" />
-			<channel id="outdoor-temperature" typeId="outdoor-temperature" />
-			<channel id="sleep-function" typeId="sleep-function" />
+			<channel id="targetTemperature" typeId="targetTemperature" />
+			<channel id="operationalMode" typeId="operationalMode" />
+			<channel id="fanSpeed" typeId="fanSpeed" />
+			<channel id="swingMode" typeId="swingMode" />
+			<channel id="ecoMode" typeId="ecoMode" />
+			<channel id="turboMode" typeId="turboMode" />
+			<channel id="indoorTemperature" typeId="indoorTemperature" />
+			<channel id="outdoorTemperature" typeId="outdoorTemperature" />
+			<channel id="sleepFunction" typeId="sleepFunction" />
 
-			<channel id="imode-resume" typeId="imode-resume" />
-			<channel id="timer-mode" typeId="timer-mode" />
-			<channel id="on-timer" typeId="on-timer" />
-			<channel id="off-timer" typeId="off-timer" />
-			<channel id="appliance-error" typeId="appliance-error" />
-			<channel id="cozy-sleep" typeId="cozy-sleep" />
+			<channel id="imodeResume" typeId="imodeResume" />
+			<channel id="timerMode" typeId="timerMode" />
+			<channel id="onTimer" typeId="onTimer" />
+			<channel id="offTimer" typeId="offTimer" />
+			<channel id="applianceError" typeId="applianceError" />
+			<channel id="cozySleep" typeId="cozySleep" />
 			<channel id="save" typeId="save" />
-			<channel id="low-frequency-fan" typeId="low-frequency-fan" />
-			<channel id="super-fan" typeId="super-fan" />
-			<channel id="feel-own" typeId="feel-own" />
-			<channel id="child-sleep-mode" typeId="child-sleep-mode" />
-			<channel id="exchange-air" typeId="exchange-air" />
-			<channel id="dry-clean" typeId="dry-clean" />
-			<channel id="aux-heat" typeId="aux-heat" />
-			<channel id="clean-up" typeId="clean-up" />
-			<channel id="temp-unit" typeId="temp-unit" />
-			<channel id="catch-cold" typeId="catch-cold" />
-			<channel id="night-light" typeId="night-light" />
-			<channel id="peak-elec" typeId="peak-elec" />
-			<channel id="natural-fan" typeId="natural-fan" />
+			<channel id="lowFrequencyFan" typeId="lowFrequencyFan" />
+			<channel id="superFan" typeId="superFan" />
+			<channel id="feelOwn" typeId="feelOwn" />
+			<channel id="childSleepMode" typeId="childSleepMode" />
+			<channel id="exchangeAir" typeId="exchangeAir" />
+			<channel id="dryClean" typeId="dryClean" />
+			<channel id="auxHeat" typeId="auxHeat" />
+			<channel id="cleanUp" typeId="cleanUp" />
+			<channel id="tempUnit" typeId="tempUnit" />
+			<channel id="catchCold" typeId="catchCold" />
+			<channel id="nightLight" typeId="nightLight" />
+			<channel id="peakElec" typeId="peakElec" />
+			<channel id="naturalFan" typeId="naturalFan" />
 			<channel id="humidity" typeId="humidity" />
-			<channel id="screen-display" typeId="screen-display" />
+			<channel id="screenDisplay" typeId="screenDisplay" />
 		</channels>
 
 		<representation-property>ipAddress</representation-property>
 
 		<config-description>
 			<parameter name="ipAddress" type="text" required="true">
-				<context>network-address</context>
+				<context>ipAddress</context>
 				<label>IP Address</label>
 				<description>IP Address of the device.</description>
 			</parameter>
 			<parameter name="ipPort" type="text" required="true">
-				<context>network-port</context>
+				<context>ipPort</context>
 				<label>IP Port</label>
 				<description>IP port of the device.</description>
 			</parameter>
 			<parameter name="deviceId" type="text" required="true">
-				<context>device-id</context>
+				<context>deviceId</context>
 				<label>Device ID</label>
 				<description>ID of the device.</description>
 			</parameter>
 			<parameter name="pollingTime" type="decimal" required="true" min="10" unit="s">
-				<context>polling-time</context>
+				<context>pollingTime</context>
 				<label>Polling time</label>
 				<description>Polling time in seconds to update status. Minimum time is 10 seconds.</description>
 				<default>10</default>
 			</parameter>
 			<parameter name="promptTone" type="boolean" required="true">
-				<context>prompt-tone</context>
+				<context>promptTone</context>
 				<label>Prompt tone</label>
 				<description>After sending a command device will play "ding" tone when command is received and executed.</description>
 				<default>false</default>
@@ -85,14 +85,14 @@
 		<description>Turn the AC on and off.</description>
 		<category>Switch</category>
 	</channel-type>
-	<channel-type id="target-temperature">
+	<channel-type id="targetTemperature">
 		<item-type>Number:Temperature</item-type>
 		<label>Target temperature</label>
 		<description>Target temperature.</description>
 		<category>Temperature</category>
 		<state readOnly="false" pattern="%d %unit%" />
 	</channel-type>
-	<channel-type id="operational-mode">
+	<channel-type id="operationalMode">
 		<item-type>String</item-type>
 		<label>Operational mode</label>
 		<description>Operational mode: OFF (turns off), AUTO, COOL, DRY, HEAT.</description>
@@ -107,7 +107,7 @@
 			</options>
 		</state>
 	</channel-type>
-	<channel-type id="fan-speed">
+	<channel-type id="fanSpeed">
 		<item-type>String</item-type>
 		<label>Fan speed</label>
 		<description>Fan speed: OFF (turns off), SILENT, LOW, MEDIUM, HIGH, AUTO.</description>
@@ -122,7 +122,7 @@
 			</options>
 		</state>
 	</channel-type>
-	<channel-type id="swing-mode">
+	<channel-type id="swingMode">
 		<item-type>String</item-type>
 		<label>Swing mode</label>
 		<description>Swing mode: OFF, VERTICAL, HORIZONTAL, BOTH.</description>
@@ -135,78 +135,80 @@
 			</options>
 		</state>
 	</channel-type>
-	<channel-type id="eco-mode">
+	<channel-type id="ecoMode">
 		<item-type>Switch</item-type>
 		<label>Eco mode</label>
-		<description>Eco mode.</description>
+		<description>Eco mode, according to manual works only in COOL mode (temperature shall be set to 24C and fan on AUTO).</description>
 		<category>Switch</category>
+		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="turbo-mode">
+	<channel-type id="turboMode">
 		<item-type>Switch</item-type>
 		<label>Turbo mode</label>
-		<description>Turbo mode, "Boost" in Midea Air app, long press "+" on IR Remote Controller.</description>
+		<description>Turbo mode, "Boost" in Midea Air app, long press "+" on IR Remote Controller. Only works in COOL and HEAT mode.</description>
 		<category>Switch</category>
 	</channel-type>
-	<channel-type id="indoor-temperature">
+	<channel-type id="indoorTemperature">
 		<item-type>Number:Temperature</item-type>
-		<label>Indoor Temperature</label>
+		<label>Indoor temperature</label>
 		<description>Indoor temperature measured in the room, where internal unit is installed.</description>
 		<category>Temperature</category>
 		<state readOnly="true" pattern="%.1f %unit%" />
 	</channel-type>
-	<channel-type id="outdoor-temperature">
+	<channel-type id="outdoorTemperature">
 		<item-type>Number:Temperature</item-type>
-		<label>Outdoor Temperature</label>
+		<label>Outdoor temperature</label>
 		<description>Outdoor temperature measured outside, where external unit is installed.</description>
 		<category>Temperature</category>
 		<state readOnly="true" pattern="%.1f %unit%" />
 	</channel-type>
-	<channel-type id="sleep-function">
+	<channel-type id="sleepFunction">
 		<item-type>Switch</item-type>
 		<label>Sleep function</label>
 		<description>Sleep function ("Moon with a star" icon on IR Remote Controller).</description>
 		<category>Switch</category>
+		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="screen-display">
+	<channel-type id="screenDisplay" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Screen display</label>
 		<description>Turns on and off displaying white digits on a device. Can be set, but status is not returned.</description>
 		<category>Switch</category>
 	</channel-type>
-	<channel-type id="imode-resume" advanced="true">
+	<channel-type id="imodeResume" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Imode resume</label>
 		<description>Imode resume.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="timer-mode" advanced="true">
+	<channel-type id="timerMode" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Timer mode</label>
 		<description>Timer mode.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="appliance-error" advanced="true">
+	<channel-type id="applianceError" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Appliance error</label>
 		<description>Appliance error.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="on-timer" advanced="true">
+	<channel-type id="onTimer" advanced="true">
 		<item-type>String</item-type>
 		<label>ON Timer</label>
 		<description>ON Timer (HH:MM) if set.</description>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="off-timer" advanced="true">
+	<channel-type id="offTimer" advanced="true">
 		<item-type>String</item-type>
 		<label>OFF Timer</label>
 		<description>OFF Timer (HH:MM) if set.</description>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="cozy-sleep" advanced="true">
+	<channel-type id="cozySleep" advanced="true">
 		<item-type>Number</item-type>
 		<label>Cozy sleep</label>
 		<description>Cozy sleep.</description>
@@ -220,89 +222,89 @@
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="low-frequency-fan" advanced="true">
+	<channel-type id="lowFrequencyFan" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Low frequency fan</label>
 		<description>Low frequency fan.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="super-fan" advanced="true">
+	<channel-type id="superFan" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Super fan</label>
 		<description>Super fan.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="feel-own" advanced="true">
+	<channel-type id="feelOwn" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Feel own</label>
 		<description>Feel own.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="child-sleep-mode" advanced="true">
+	<channel-type id="childSleepMode" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Child sleep mode</label>
 		<description>Child sleep mode.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="exchange-air" advanced="true">
+	<channel-type id="exchangeAir" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Exchange air</label>
 		<description>Exchange air.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="dry-clean" advanced="true">
+	<channel-type id="dryClean" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Dry clean</label>
 		<description>Dry clean.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="aux-heat" advanced="true">
+	<channel-type id="auxHeat" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Aux heat</label>
 		<description>Aux heat.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="clean-up" advanced="true">
+	<channel-type id="cleanUp" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Clean up</label>
 		<description>Clean up.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="temp-unit" advanced="true">
+	<channel-type id="tempUnit" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Temperature unit</label>
 		<description>If set Farenheit unit are be displayed, otherwise Celcius.</description>
 		<category>Switch</category>
 	</channel-type>
-	<channel-type id="catch-cold" advanced="true">
+	<channel-type id="catchCold" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Catch cold</label>
 		<description>Catch cold.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="night-light" advanced="true">
+	<channel-type id="nightLight" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Night light</label>
 		<description>Night light.</description>
 		<category>Switch</category>
 	</channel-type>
-	<channel-type id="peak-elec" advanced="true">
+	<channel-type id="peakElec" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Peak elec</label>
 		<description>Peak elec.</description>
 		<category>Switch</category>
 		<state readOnly="true" />
 	</channel-type>
-	<channel-type id="natural-fan" advanced="true">
+	<channel-type id="naturalFan" advanced="true">
 		<item-type>Switch</item-type>
 		<label>Natural fan</label>
 		<description>Natural fan.</description>

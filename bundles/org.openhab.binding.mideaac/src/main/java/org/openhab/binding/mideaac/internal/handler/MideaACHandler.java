@@ -133,8 +133,6 @@ public class MideaACHandler extends BaseThingHandler {
             handleScreenDisplay(command);
         } else if (channelUID.getId().equals(CHANNEL_TEMP_UNIT)) {
             handleTempUnit(command);
-        } else if (channelUID.getId().equals(CHANNEL_PROMPT_TONE)) {
-            // handlePromptTone(command);
         }
     }
 
@@ -372,7 +370,9 @@ public class MideaACHandler extends BaseThingHandler {
                 || (isOffline() && !statusMessage.equals(getDescription())) || !isOffline()) {
             logger.debug("Changing status of {} from {}({}) to OFFLINE({})", thing.getUID(), getStatus(), getDetail(),
                     statusDetail);
-            updateStatus(ThingStatus.UNKNOWN);
+            if (isOffline()) {
+                updateStatus(ThingStatus.UNKNOWN);
+            }
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {
@@ -438,19 +438,6 @@ public class MideaACHandler extends BaseThingHandler {
 
         public ConnectionManager(String ipv4Address) {
             deviceIsConnected = false;
-            // try {
-            // ifAddress = InetAddress.getByName(ipv4Address);
-            // logger.debug("Handler for {} using address {} on network interface {}", thing.getUID(),
-            // ifAddress.getHostAddress(), NetworkInterface.getByInetAddress(ifAddress).getName());
-            // } catch (UnknownHostException e) {
-            // logger.warn("Handler for {} got UnknownHostException getting local IPv4 net interface: {}",
-            // thing.getUID(), e.getMessage(), e);
-            // markOfflineWithMessage(ThingStatusDetail.OFFLINE.CONFIGURATION_ERROR, "No suitable network interface");
-            // } catch (SocketException e) {
-            // logger.warn("Handler for {} got SocketException getting local IPv4 network interface: {}",
-            // thing.getUID(), e.getMessage(), e);
-            // markOfflineWithMessage(ThingStatusDetail.OFFLINE.CONFIGURATION_ERROR, "No suitable network interface");
-            // }
         }
 
         /*
@@ -473,6 +460,7 @@ public class MideaACHandler extends BaseThingHandler {
                 logger.debug("IOException connecting to  {} at {}: {}", thing.getUID(), ipAddress, e.getMessage());
                 markOfflineWithMessage(ThingStatusDetail.OFFLINE.COMMUNICATION_ERROR, e.getMessage());
                 disconnect();
+                scheduleConnectionMonitorJob();
                 return;
             }
 
@@ -521,6 +509,7 @@ public class MideaACHandler extends BaseThingHandler {
                         command);
                 connect();
                 if (isConnected()) {
+                    sendCommand(command);
                     return;
                 }
             }
@@ -537,8 +526,7 @@ public class MideaACHandler extends BaseThingHandler {
                     markOnline();
                     lastResponse = new Response(responseBytes);
                     processMessage(lastResponse);
-                } else {
-                    markOfflineWithMessage(ThingStatusDetail.OFFLINE.COMMUNICATION_ERROR, "No data received");
+                    return;
                 }
 
             } catch (SocketException e) {
@@ -550,7 +538,7 @@ public class MideaACHandler extends BaseThingHandler {
                 markOfflineWithMessage(ThingStatusDetail.OFFLINE.COMMUNICATION_ERROR, e.getMessage());
                 disconnect();
             }
-
+            scheduleConnectionMonitorJob();
         }
 
         protected synchronized void disconnect() {
@@ -622,8 +610,6 @@ public class MideaACHandler extends BaseThingHandler {
             updateChannel(CHANNEL_INDOOR_TEMPERATURE, new DecimalType(response.getIndoorTemperature()));
             updateChannel(CHANNEL_OUTDOOR_TEMPERATURE, new DecimalType(response.getOutdoorTemperature()));
             updateChannel(CHANNEL_HUMIDITY, new DecimalType(response.getHumidity()));
-            // updateChannel(CHANNEL_PROMPT_TONE, response.getPro() == true ? OnOffType.ON : OnOffType.OFF);
-
         }
 
         public byte[] read() {
@@ -637,6 +623,7 @@ public class MideaACHandler extends BaseThingHandler {
                     return bytes;
                 }
             } catch (IOException e) {
+                disconnect();
                 markOfflineWithMessage(ThingStatusDetail.OFFLINE.COMMUNICATION_ERROR, e.getMessage());
             }
 
@@ -660,7 +647,7 @@ public class MideaACHandler extends BaseThingHandler {
          */
         private void scheduleConnectionMonitorJob() {
             if (connectionMonitorJob == null) {
-                logger.debug("Starting connection monitor job in {} seconds for {} at {}", config.getPollingTime(), // CONNECTION_MONITOR_DELAY
+                logger.debug("Starting connection monitor job in {} seconds for {} at {}", config.getPollingTime(),
                         thing.getUID(), ipAddress);
                 connectionMonitorJob = scheduler.scheduleWithFixedDelay(connectionMonitorRunnable,
                         CONNECTION_MONITOR_DELAY, CONNECTION_MONITOR_FREQ, TimeUnit.SECONDS);

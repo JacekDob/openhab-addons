@@ -162,78 +162,69 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
         final String ipAddress = packet.getAddress().getHostAddress();
         byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
 
-        logger.debug("Data.Length: '{}' from {}", data.length, ipAddress);
+        logger.debug("Midea AC discover data ({}) from {}: '{}'", data.length, ipAddress, Utils.bytesToHex(data));
 
-        if (data.length != 120) {
-            logger.debug(
-                    "Midea AC device was detected, but the retrieved data is incomplete: '{}'. Device not registered",
-                    new String(packet.getData(), 0, packet.getLength() - 1, StandardCharsets.UTF_8));
-        } else {
-            logger.debug("Midea AC discover data: '{}'",
-                    // new String(packet.getData(), 0, packet.getLength() - 1, StandardCharsets.UTF_8),
-                    Utils.bytesToHex(data));
-
-            if (data.length >= 104 && (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("5A5A")
-                    || Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5A5A"))) {
-                logger.trace("Device supported");
-                String m_id, m_version = "", m_ip = "", m_port = "", m_sn = "", m_ssid = "", m_type = "";
-                if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("5A5A")) {
-                    m_version = "2";
-                }
-                if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("8370")) {
-                    m_version = "3";
-                }
-                if (Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5a5a")) {
-                    data = Arrays.copyOfRange(data, 8, data.length - 8);
-                }
-
-                logger.trace("Version: {}", m_version);
-
-                byte[] id = Arrays.copyOfRange(data, 20, 26);
-                logger.trace("Id Bytes: {}", Utils.bytesToHex(id));
-
-                ArrayUtils.reverse(id);
-                BigInteger bi_id = new BigInteger(id);
-                m_id = bi_id.toString();
-
-                logger.debug("Id: '{}'", m_id);
-
-                byte[] encrypt_data = Arrays.copyOfRange(data, 40, data.length - 16);
-                logger.debug("Encrypt data: '{}'", Utils.bytesToHex(encrypt_data));
-
-                byte[] reply = Security.aes_decrypt(encrypt_data);
-                logger.debug("Length: {}, Reply: '{}'", reply.length, Utils.bytesToHex(reply));
-                logger.debug("Reply: '{}'", new String(reply, StandardCharsets.UTF_8));
-
-                m_ip = Byte.toUnsignedInt(reply[3]) + "." + Byte.toUnsignedInt(reply[2]) + "."
-                        + Byte.toUnsignedInt(reply[1]) + "." + Byte.toUnsignedInt(reply[0]);
-                logger.debug("IP: '{}'", m_ip);
-
-                m_port = String.valueOf(bytes2port(Arrays.copyOfRange(reply, 4, 8)));
-                logger.debug("Port: '{}'", m_port);
-
-                m_sn = new String(reply, 8, 40 - 8, StandardCharsets.UTF_8);
-                logger.debug("SN: '{}'", m_sn);
-
-                logger.trace("SSID length: '{}'", Byte.toUnsignedInt(reply[40]));
-
-                m_ssid = new String(reply, 41, reply[40], StandardCharsets.UTF_8);
-                logger.debug("SSID: '{}'", m_ssid);
-
-                m_type = m_ssid.split("_")[1];
-                logger.debug("Type: '{}'", m_type);
-
-                // TODO:
-                // m_support = support_test(m_ip, int(m_id), int(m_port))
-
-                String thingName = createThingName(packet.getAddress().getAddress(), m_id, m_ssid);
-                ThingUID thingUID = new ThingUID(THING_TYPE_MIDEAAC, thingName.toLowerCase());
-                thingDiscovered(DiscoveryResultBuilder.create(thingUID).withLabel(thingName)
-                        .withRepresentationProperty(CONFIG_IP).withThingType(THING_TYPE_MIDEAAC)
-                        .withProperties(collectProperties(ipAddress, m_version, m_id, m_port, m_sn, m_ssid, m_type))
-                        .build());
+        if (data.length >= 104 && (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("5A5A")
+                || Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5A5A"))) {
+            logger.trace("Device supported");
+            String m_id, m_version = "", m_ip = "", m_port = "", m_sn = "", m_ssid = "", m_type = "";
+            if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("5A5A")) {
+                m_version = "2";
+            }
+            if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("8370")) {
+                m_version = "3";
+            }
+            if (Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5a5a")) {
+                data = Arrays.copyOfRange(data, 8, data.length - 8);
             }
 
+            logger.trace("Version: {}", m_version);
+
+            byte[] id = Arrays.copyOfRange(data, 20, 26);
+            logger.trace("Id Bytes: {}", Utils.bytesToHex(id));
+
+            ArrayUtils.reverse(id);
+            BigInteger bi_id = new BigInteger(id);
+            m_id = bi_id.toString();
+
+            logger.debug("Id: '{}'", m_id);
+
+            byte[] encrypt_data = Arrays.copyOfRange(data, 40, data.length - 16);
+            logger.debug("Encrypt data: '{}'", Utils.bytesToHex(encrypt_data));
+
+            byte[] reply = Security.aes_decrypt(encrypt_data);
+            logger.debug("Length: {}, Reply: '{}'", reply.length, Utils.bytesToHex(reply));
+            logger.debug("Reply: '{}'", new String(reply, StandardCharsets.UTF_8));
+
+            m_ip = Byte.toUnsignedInt(reply[3]) + "." + Byte.toUnsignedInt(reply[2]) + "."
+                    + Byte.toUnsignedInt(reply[1]) + "." + Byte.toUnsignedInt(reply[0]);
+            logger.debug("IP: '{}'", m_ip);
+
+            m_port = String.valueOf(bytes2port(Arrays.copyOfRange(reply, 4, 8)));
+            logger.debug("Port: '{}'", m_port);
+
+            m_sn = new String(reply, 8, 40 - 8, StandardCharsets.UTF_8);
+            logger.debug("SN: '{}'", m_sn);
+
+            logger.trace("SSID length: '{}'", Byte.toUnsignedInt(reply[40]));
+
+            m_ssid = new String(reply, 41, reply[40], StandardCharsets.UTF_8);
+            logger.debug("SSID: '{}'", m_ssid);
+
+            m_type = m_ssid.split("_")[1];
+            logger.debug("Type: '{}'", m_type);
+
+            // TODO:
+            // m_support = support_test(m_ip, int(m_id), int(m_port))
+
+            String thingName = createThingName(packet.getAddress().getAddress(), m_id, m_ssid);
+            ThingUID thingUID = new ThingUID(THING_TYPE_MIDEAAC, thingName.toLowerCase());
+            thingDiscovered(DiscoveryResultBuilder.create(thingUID).withLabel(thingName)
+                    .withRepresentationProperty(CONFIG_IP_ADDRESS).withThingType(THING_TYPE_MIDEAAC)
+                    .withProperties(collectProperties(ipAddress, m_version, m_id, m_port, m_sn, m_ssid, m_type))
+                    .build());
+        } else if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 6)).equals("3c3f786d6c20")) {
+            logger.debug("Midea AC v1 device was detected, supported, but not implemented yet.");
             // TODO:
             // if data[:6].hex() == '3c3f786d6c20':
             // m_version = 'V1'
@@ -248,7 +239,11 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
             // "*** Found a {} device - type: '0x{}' - version: {} - ip: {} - port: {} - id: {} - sn: {} - ssid:
             // {}".format(m_support, m_type, m_version, m_ip, m_port, m_id, m_sn, m_ssid))
 
+        } else {
+            logger.debug(
+                    "Midea AC device was detected, but the retrieved data is incomplete or not supported. Device not registered");
         }
+
     }
 
     private int bytes2port(byte[] bytes) {
@@ -289,8 +284,8 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
     private Map<String, Object> collectProperties(String ipAddress, String version, String id, String port, String sn,
             String ssid, String type) {
         final Map<String, Object> properties = new TreeMap<>();
-        properties.put(CONFIG_IP, ipAddress);
-        properties.put(CONFIG_PORT, port);
+        properties.put(CONFIG_IP_ADDRESS, ipAddress);
+        properties.put(CONFIG_IP_PORT, port);
         properties.put(CONFIG_DEVICEID, id);
         properties.put(CONFIG_POLLING_TIME, 10);
         properties.put(CONFIG_PROMPT_TONE, false);
