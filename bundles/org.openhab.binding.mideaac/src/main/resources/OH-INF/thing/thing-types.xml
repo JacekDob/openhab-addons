@@ -56,12 +56,14 @@
 			<parameter name="ipPort" type="text" required="true">
 				<context>ipPort</context>
 				<label>IP Port</label>
-				<description>IP port of the device.</description>
+				<description>IP port of the device (for V2: 6444).</description>
+				<default>6444</default>
 			</parameter>
 			<parameter name="deviceId" type="text" required="true">
 				<context>deviceId</context>
 				<label>Device ID</label>
-				<description>ID of the device.</description>
+				<description>ID of the device. Leave 0 to do ID discovery.</description>
+				<default>0</default>
 			</parameter>
 			<parameter name="pollingTime" type="decimal" required="true" min="10" unit="s">
 				<context>pollingTime</context>

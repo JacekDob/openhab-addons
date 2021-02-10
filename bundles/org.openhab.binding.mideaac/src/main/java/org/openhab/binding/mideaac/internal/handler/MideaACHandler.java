@@ -29,9 +29,13 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.mideaac.internal.MideaACConfiguration;
 import org.openhab.binding.mideaac.internal.Utils;
+import org.openhab.binding.mideaac.internal.discovery.DiscoveryHandler;
+import org.openhab.binding.mideaac.internal.discovery.MideaACDiscoveryService;
 import org.openhab.binding.mideaac.internal.handler.CommandBase.FanSpeed;
 import org.openhab.binding.mideaac.internal.handler.CommandBase.OperationalMode;
 import org.openhab.binding.mideaac.internal.handler.CommandBase.SwingMode;
+import org.openhab.core.config.core.Configuration;
+import org.openhab.core.config.discovery.DiscoveryResult;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.QuantityType;
@@ -55,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author Jacek Dobrowolski
  */
 @NonNullByDefault
-public class MideaACHandler extends BaseThingHandler {
+public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler {
 
     private final Logger logger = LoggerFactory.getLogger(MideaACHandler.class);
 
@@ -326,10 +330,26 @@ public class MideaACHandler extends BaseThingHandler {
         logger.debug("MideaACHandler config for {} is {}", thing.getUID(), config);
 
         if (!config.isValid()) {
-            logger.debug("MideaACHandler config of {} is invalid. Check configuration", thing.getUID());
-            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-                    "Invalid MideaAC config. Check configuration.");
-            return;
+            logger.warn("Configuration invalid for {}", thing.getUID());
+            if (config.isDiscoveryNeeded()) {
+                logger.warn("Discovery needed, discovering....", thing.getUID());
+                updateStatus(ThingStatus.UNKNOWN, ThingStatusDetail.CONFIGURATION_PENDING,
+                        "Configuration missing, discovery needed. Discovering...");
+                MideaACDiscoveryService discoveryService = new MideaACDiscoveryService();
+                try {
+                    discoveryService.discoverThing(config.getIpAddress(), this);
+                } catch (Exception e) {
+                    logger.error("Discovery failure for {}: {}", thing.getUID(), e.getMessage());
+                }
+                return;
+            } else {
+                logger.debug("MideaACHandler config of {} is invalid. Check configuration", thing.getUID());
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
+                        "Invalid MideaAC config. Check configuration.");
+                return;
+            }
+        } else {
+            logger.debug("Configuration valid for {}", thing.getUID());
         }
 
         ipAddress = config.getIpAddress();
@@ -338,10 +358,25 @@ public class MideaACHandler extends BaseThingHandler {
 
         logger.debug("IPAddress: {}", ipAddress);
         logger.debug("IPPort: {}", ipPort);
+        logger.debug("ID: {}", deviceId);
 
         updateStatus(ThingStatus.UNKNOWN);
 
         connectionManager.connect();
+    }
+
+    @Override
+    public void discovered(DiscoveryResult discoveryResult) {
+        logger.debug("Discovered {}", thing.getUID());
+        String deviceId = discoveryResult.getProperties().get(CONFIG_DEVICEID).toString();
+        String ipPort = discoveryResult.getProperties().get(CONFIG_IP_PORT).toString();
+
+        Configuration configuration = editConfiguration();
+        configuration.put(CONFIG_DEVICEID, deviceId);
+        configuration.put(CONFIG_IP_PORT, ipPort);
+        updateConfiguration(configuration);
+
+        initialize();
     }
 
     /*
@@ -516,7 +551,7 @@ public class MideaACHandler extends BaseThingHandler {
 
             try {
                 byte[] bytes = packet.getBytes();
-                logger.info("Writing to {} at {} bytes.length: {}, bytes: {}", thing.getUID(), ipAddress, bytes.length,
+                logger.debug("Writing to {} at {} bytes.length: {}, bytes: {}", thing.getUID(), ipAddress, bytes.length,
                         Utils.bytesToHex(bytes));
                 write(bytes);
 

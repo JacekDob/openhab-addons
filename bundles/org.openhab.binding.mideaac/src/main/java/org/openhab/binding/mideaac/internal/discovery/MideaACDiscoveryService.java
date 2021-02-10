@@ -35,6 +35,7 @@ import org.openhab.binding.mideaac.internal.Utils;
 import org.openhab.binding.mideaac.internal.handler.CommandBase;
 import org.openhab.binding.mideaac.internal.security.Security;
 import org.openhab.core.config.discovery.AbstractDiscoveryService;
+import org.openhab.core.config.discovery.DiscoveryResult;
 import org.openhab.core.config.discovery.DiscoveryResultBuilder;
 import org.openhab.core.config.discovery.DiscoveryService;
 import org.openhab.core.thing.ThingUID;
@@ -62,6 +63,9 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
     private final byte[] buffer = new byte[512];
     @Nullable
     private DatagramSocket discoverSocket;
+
+    private boolean fullDiscovery = false;
+    DiscoveryHandler discoveryHandler;
 
     public MideaACDiscoveryService() {
         super(SUPPORTED_THING_TYPES_UIDS, DISCOVERY_TIMEOUT_SECONDS, false);
@@ -114,16 +118,56 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
     }
 
     /**
+     * Performs the actual discovery of Midea AC devices (things).
+     */
+    public void discoverThing(String ipAddress, DiscoveryHandler discoveryHandler) {
+        try {
+            final DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+            // No need to call close first, because the caller of this method already has done it.
+            startDiscoverSocket(ipAddress, discoveryHandler);
+            // Runs until the socket call gets a time out and throws an exception. When a time out is triggered it means
+            // no data was present and nothing new to discover.
+            while (true) {
+                // Set packet length in case a previous call reduced the size.
+                receivePacket.setLength(buffer.length);
+                if (discoverSocket == null) {
+                    break;
+                } else {
+                    discoverSocket.receive(receivePacket);
+                }
+                logger.debug("Midea AC device discovery returned package with length {}", receivePacket.getLength());
+                if (receivePacket.getLength() > 0) {
+                    thingDiscovered(receivePacket);
+                }
+            }
+        } catch (SocketTimeoutException e) {
+            logger.debug("Discovering poller timeout...");
+        } catch (IOException e) {
+            // logger.debug("Error during discovery: {}", e.getMessage());
+        } finally {
+            closeDiscoverSocket();
+        }
+    }
+
+    /**
      * Opens a {@link DatagramSocket} and sends a packet for discovery of Midea AC devices.
      *
      * @throws SocketException
      * @throws IOException
      */
     private void startDiscoverSocket() throws SocketException, IOException {
+        fullDiscovery = true;
+        startDiscoverSocket("255.255.255.255", null);
+    }
+
+    public void startDiscoverSocket(String ipAddress, DiscoveryHandler discoveryHandler)
+            throws SocketException, IOException {
+        logger.trace("Discovering: {}", ipAddress);
+        this.discoveryHandler = discoveryHandler;
         discoverSocket = new DatagramSocket(new InetSocketAddress(Connection.MIDEAAC_RECEIVE_PORT));
         discoverSocket.setBroadcast(true);
         discoverSocket.setSoTimeout(UDP_PACKET_TIMEOUT);
-        final InetAddress broadcast = InetAddress.getByName("255.255.255.255");
+        final InetAddress broadcast = InetAddress.getByName(ipAddress);
         {
             final DatagramPacket discoverPacket = new DatagramPacket(CommandBase.discover(),
                     CommandBase.discover().length, broadcast, Connection.MIDEAAC_SEND_PORT1);
@@ -159,6 +203,18 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
      * @param packet containing data of detected device
      */
     private void thingDiscovered(DatagramPacket packet) {
+
+        DiscoveryResult dr = discoveryPacketReceived(packet);
+        if (dr != null) {
+            if (discoveryHandler != null) {
+                discoveryHandler.discovered(dr);
+            } else {
+                thingDiscovered(dr);
+            }
+        }
+    }
+
+    public DiscoveryResult discoveryPacketReceived(DatagramPacket packet) {
         final String ipAddress = packet.getAddress().getHostAddress();
         byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
 
@@ -174,7 +230,7 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
             if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 2)).equals("8370")) {
                 m_version = "3";
             }
-            if (Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5a5a")) {
+            if (Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5A5A")) {
                 data = Arrays.copyOfRange(data, 8, data.length - 8);
             }
 
@@ -219,11 +275,13 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
 
             String thingName = createThingName(packet.getAddress().getAddress(), m_id, m_ssid);
             ThingUID thingUID = new ThingUID(THING_TYPE_MIDEAAC, thingName.toLowerCase());
-            thingDiscovered(DiscoveryResultBuilder.create(thingUID).withLabel(thingName)
+
+            return DiscoveryResultBuilder.create(thingUID).withLabel(thingName)
                     .withRepresentationProperty(CONFIG_IP_ADDRESS).withThingType(THING_TYPE_MIDEAAC)
                     .withProperties(collectProperties(ipAddress, m_version, m_id, m_port, m_sn, m_ssid, m_type))
-                    .build());
-        } else if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 6)).equals("3c3f786d6c20")) {
+                    .build();
+
+        } else if (Utils.bytesToHex(Arrays.copyOfRange(data, 0, 6)).equals("3C3F786D6C20")) {
             logger.debug("Midea AC v1 device was detected, supported, but not implemented yet.");
             // TODO:
             // if data[:6].hex() == '3c3f786d6c20':
@@ -238,12 +296,12 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
             // _LOGGER.info(
             // "*** Found a {} device - type: '0x{}' - version: {} - ip: {} - port: {} - id: {} - sn: {} - ssid:
             // {}".format(m_support, m_type, m_version, m_ip, m_port, m_id, m_sn, m_ssid))
-
+            return null;
         } else {
             logger.debug(
                     "Midea AC device was detected, but the retrieved data is incomplete or not supported. Device not registered");
+            return null;
         }
-
     }
 
     private int bytes2port(byte[] bytes) {

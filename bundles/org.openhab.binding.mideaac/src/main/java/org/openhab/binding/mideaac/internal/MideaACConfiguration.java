@@ -80,8 +80,21 @@ public class MideaACConfiguration {
         if (StringUtils.isBlank(ipPort)) {
             return false;
         }
-        if (StringUtils.isBlank(deviceId)) {
+        if (StringUtils.isBlank(deviceId) || deviceId.equalsIgnoreCase("0")) {
             return false;
+        }
+        return true;
+    }
+
+    public boolean isDiscoveryNeeded() {
+        if (StringUtils.isBlank(ipAddress) || !Utils.validateIP(ipAddress)) {
+            return false;
+        }
+        if (StringUtils.isBlank(ipPort)) {
+            return true;
+        }
+        if (StringUtils.isBlank(deviceId) || deviceId.equalsIgnoreCase("0")) {
+            return true;
         }
         return true;
     }
