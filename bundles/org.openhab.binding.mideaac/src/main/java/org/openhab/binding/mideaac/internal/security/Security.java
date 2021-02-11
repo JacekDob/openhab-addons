@@ -36,20 +36,25 @@ public class Security {
             try {
                 cipher.init(Cipher.DECRYPT_MODE, key);
             } catch (InvalidKeyException e) {
+                logger.warn("AES decryption error: InvalidKeyException: {}", e.getMessage());
                 return null;
             }
 
             try {
                 plainText = cipher.doFinal(encrypt_data);
             } catch (IllegalBlockSizeException e) {
+                logger.warn("AES decryption error: IllegalBlockSizeException: {}", e.getMessage());
                 return null;
             } catch (BadPaddingException e) {
+                logger.warn("AES decryption error: BadPaddingException: {}", e.getMessage());
                 return null;
             }
 
         } catch (NoSuchAlgorithmException e) {
+            logger.warn("AES decryption error: NoSuchAlgorithmException: {}", e.getMessage());
             return null;
         } catch (NoSuchPaddingException e) {
+            logger.warn("AES decryption error: NoSuchPaddingException: {}", e.getMessage());
             return null;
         }
 
@@ -67,18 +72,23 @@ public class Security {
             try {
                 cipher.init(Cipher.ENCRYPT_MODE, key);
             } catch (InvalidKeyException e) {
+                logger.warn("AES encryption error: InvalidKeyException: {}", e.getMessage());
             }
 
             try {
                 encryptData = cipher.doFinal(plainText);
             } catch (IllegalBlockSizeException e) {
+                logger.warn("AES encryption error: IllegalBlockSizeException: {}", e.getMessage());
                 return null;
             } catch (BadPaddingException e) {
+                logger.warn("AES encryption error: BadPaddingException: {}", e.getMessage());
                 return null;
             }
         } catch (NoSuchAlgorithmException e) {
+            logger.warn("AES encryption error: NoSuchAlgorithmException: {}", e.getMessage());
             return null;
         } catch (NoSuchPaddingException e) {
+            logger.warn("AES encryption error: NoSuchPaddingException: {}", e.getMessage());
             return null;
         }
 

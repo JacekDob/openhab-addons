@@ -231,7 +231,7 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
                 m_version = "3";
             }
             if (Utils.bytesToHex(Arrays.copyOfRange(data, 8, 10)).equals("5A5A")) {
-                data = Arrays.copyOfRange(data, 8, data.length - 8);
+                data = Arrays.copyOfRange(data, 8, data.length - 16);
             }
 
             logger.trace("Version: {}", m_version);
