@@ -35,6 +35,8 @@ import org.openhab.core.thing.binding.BaseThingHandler;
 import org.openhab.core.thing.type.ChannelTypeUID;
 import org.openhab.core.types.Command;
 import org.openhab.core.types.RefreshType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link SerialDeviceHandler} is responsible for handling commands, which are
@@ -44,6 +46,8 @@ import org.openhab.core.types.RefreshType;
  */
 @NonNullByDefault
 public class SerialDeviceHandler extends BaseThingHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(SerialDeviceHandler.class);
 
     private final ValueTransformationProvider valueTransformationProvider;
 
@@ -134,6 +138,7 @@ public class SerialDeviceHandler extends BaseThingHandler {
      */
     public void handleData(final String data) {
         final Pattern devicePattern = this.devicePattern;
+        logger.trace("Handling data for thing: {}, data: {}", thing.getUID(), data);
 
         if (devicePattern != null && devicePattern.matcher(data).matches()) {
             channels.forEach((channelUID, channel) -> refresh(channelUID, channel, data));
@@ -159,6 +164,8 @@ public class SerialDeviceHandler extends BaseThingHandler {
      * @param channelId the channel to refresh
      */
     private void refresh(final ChannelUID channelUID, final DeviceChannel channel, final String data) {
+        logger.trace("Refreshing data for thing: {}, channel: {}, data: {}", thing.getUID(), channel, data);
+
         if (!isLinked(channelUID)) {
             return;
         }

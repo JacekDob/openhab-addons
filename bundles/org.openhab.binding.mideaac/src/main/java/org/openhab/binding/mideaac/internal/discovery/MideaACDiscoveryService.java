@@ -250,7 +250,6 @@ public class MideaACDiscoveryService extends AbstractDiscoveryService {
 
             byte[] reply = Security.aes_decrypt(encrypt_data);
             logger.debug("Length: {}, Reply: '{}'", reply.length, Utils.bytesToHex(reply));
-            logger.debug("Reply: '{}'", new String(reply, StandardCharsets.UTF_8));
 
             m_ip = Byte.toUnsignedInt(reply[3]) + "." + Byte.toUnsignedInt(reply[2]) + "."
                     + Byte.toUnsignedInt(reply[1]) + "." + Byte.toUnsignedInt(reply[0]);

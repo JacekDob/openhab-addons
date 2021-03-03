@@ -119,6 +119,11 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
             return;
         }
 
+        if (getLastResponse() == null) {
+            markOfflineWithMessage(ThingStatusDetail.COMMUNICATION_ERROR, "Device not responding with its status.");
+            return;
+        }
+
         if (channelUID.getId().equals(CHANNEL_POWER)) {
             handlePower(command);
         } else if (channelUID.getId().equals(CHANNEL_OPERATIONAL_MODE)) {
@@ -562,6 +567,9 @@ public class MideaACHandler extends BaseThingHandler implements DiscoveryHandler
                     lastResponse = new Response(responseBytes);
                     processMessage(lastResponse);
                     return;
+                } else {
+                    markOfflineWithMessage(ThingStatusDetail.COMMUNICATION_ERROR,
+                            "Device not responding with its status.");
                 }
 
             } catch (SocketException e) {

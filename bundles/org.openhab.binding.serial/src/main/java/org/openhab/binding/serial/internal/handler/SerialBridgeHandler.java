@@ -12,9 +12,7 @@
  */
 package org.openhab.binding.serial.internal.handler;
 
-import static org.openhab.binding.serial.internal.SerialBindingConstants.BINARY_CHANNEL;
-import static org.openhab.binding.serial.internal.SerialBindingConstants.STRING_CHANNEL;
-import static org.openhab.binding.serial.internal.SerialBindingConstants.TRIGGER_CHANNEL;
+import static org.openhab.binding.serial.internal.SerialBindingConstants.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -253,7 +251,7 @@ public class SerialBridgeHandler extends BaseBridgeHandler implements SerialPort
 
     /**
      * Read from the serial port and process the data
-     * 
+     *
      * @param sb the string builder to receive the data
      * @param firstAttempt indicates if this is the first read attempt without waiting
      */
@@ -271,9 +269,13 @@ public class SerialBridgeHandler extends BaseBridgeHandler implements SerialPort
 
                 // read data from serial device
                 while (inputStream.available() > 0) {
+                    logger.trace("Data available on serial, reading...");
                     final int bytes = inputStream.read(readBuffer);
                     sb.append(new String(readBuffer, 0, bytes, charset));
                 }
+
+                final String result = sb.toString();
+                logger.trace("Received temporary string: {}", result);
 
                 // Add wait states around reading the stream, so that interrupted transmissions
                 // are merged
@@ -283,12 +285,14 @@ public class SerialBridgeHandler extends BaseBridgeHandler implements SerialPort
 
             } else {
                 final String result = sb.toString();
+                logger.trace("Received string: {}", result);
 
                 triggerChannel(TRIGGER_CHANNEL, CommonTriggerEvents.PRESSED);
                 refresh(STRING_CHANNEL, result);
                 refresh(BINARY_CHANNEL, result);
 
                 result.lines().forEach(l -> getThing().getThings().forEach(t -> {
+                    logger.trace("Processing line: {}", l);
                     final SerialDeviceHandler device = (SerialDeviceHandler) t.getHandler();
                     if (device != null) {
                         device.handleData(l);

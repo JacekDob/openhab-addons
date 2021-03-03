@@ -34,7 +34,8 @@ public class CommandBase {
         COOL(2),
         DRY(3),
         HEAT(4),
-        FAN_ONLY(5);
+        FAN_ONLY(5),
+        UNKWNOWN(0);
 
         private final int value;
 
@@ -52,7 +53,7 @@ public class CommandBase {
                     return type;
                 }
             }
-            return null;
+            return UNKWNOWN;
         }
     }
 
@@ -60,7 +61,8 @@ public class CommandBase {
         OFF(0),
         VERTICAL(0xC),
         HORIZONTAL(0x3),
-        BOTH(0xF);
+        BOTH(0xF),
+        UNKNOWN(0xFF);
 
         private final int value;
 
@@ -78,7 +80,7 @@ public class CommandBase {
                     return type;
                 }
             }
-            return null;
+            return UNKNOWN;
         }
     }
 
@@ -87,7 +89,8 @@ public class CommandBase {
         HIGH(80),
         MEDIUM(60),
         LOW(40),
-        SILENT(20);
+        SILENT(20),
+        UNKNOWN(0);
 
         private final int value;
 
@@ -105,7 +108,7 @@ public class CommandBase {
                     return type;
                 }
             }
-            return null;
+            return UNKNOWN;
         }
     }
 
